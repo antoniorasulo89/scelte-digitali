@@ -1003,6 +1003,7 @@ const voiceSelect = $("#voiceSelect");
 const voiceNote = $("#voiceNote");
 
 let selectedVoice = null;
+let voiceChoiceIsManual = false;
 let activeSpeechButton = null;
 let speechToken = 0;
 
@@ -1044,14 +1045,15 @@ function loadVoices() {
     .join("");
   voiceSelect.disabled = false;
 
-  if (selectedVoice && voices.some((voice) => voice.name === selectedVoice.name)) {
+  if (voiceChoiceIsManual && selectedVoice && voices.some((voice) => voice.name === selectedVoice.name)) {
     voiceSelect.value = selectedVoice.name;
   } else {
     selectedVoice = ordered[0];
     voiceSelect.value = selectedVoice.name;
+    voiceChoiceIsManual = false;
   }
 
-  voiceNote.textContent = "La qualità dipende dalle voci installate nel sistema. Puoi aggiungerne altre dalle impostazioni del dispositivo.";
+  voiceNote.textContent = "La qualità dipende dalle voci del sistema. Su Chrome, se disponibile, l'app usa la voce Google italiana.";
   voiceSettings.hidden = false;
 }
 
@@ -1266,7 +1268,10 @@ document.addEventListener("click", (event) => {
 
 voiceSelect.addEventListener("change", () => {
   const voice = italianVoices().find((item) => item.name === voiceSelect.value);
-  if (voice) selectedVoice = voice;
+  if (voice) {
+    selectedVoice = voice;
+    voiceChoiceIsManual = true;
+  }
   stopSpeech();
 });
 
