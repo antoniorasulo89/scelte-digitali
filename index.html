@@ -58,8 +58,18 @@
         <details class="voice-settings" id="voiceSettings" hidden>
           <summary>Voce</summary>
           <div class="voice-panel">
-            <label for="voiceSelect">Voce del dispositivo</label>
-            <select id="voiceSelect"></select>
+            <div class="voice-field">
+              <label for="voiceSelect">Voce del dispositivo</label>
+              <select id="voiceSelect"></select>
+            </div>
+            <div class="voice-field">
+              <label for="voiceRate">Velocità</label>
+              <select id="voiceRate">
+                <option value="0.85">Lenta</option>
+                <option value="1" selected>Normale</option>
+                <option value="1.15">Veloce</option>
+              </select>
+            </div>
             <button class="voice-test" id="voiceTest" type="button" aria-pressed="false" data-label="Prova">
               <svg class="icon" aria-hidden="true"><use href="#i-speaker"></use></svg>
               <span class="speak-label">Prova</span>

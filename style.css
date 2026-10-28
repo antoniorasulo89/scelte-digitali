@@ -258,6 +258,10 @@ svg {
   box-shadow: 0 22px 40px -26px rgba(23, 32, 29, .45);
 }
 
+.voice-field + .voice-field {
+  margin-top: 10px;
+}
+
 .voice-panel label {
   display: block;
   margin-bottom: 6px;

@@ -1000,12 +1000,15 @@ const speechSupported = "speechSynthesis" in window &&
 
 const voiceSettings = $("#voiceSettings");
 const voiceSelect = $("#voiceSelect");
+const voiceRateSelect = $("#voiceRate");
 const voiceNote = $("#voiceNote");
 
 let selectedVoice = null;
 let voiceChoiceIsManual = false;
+let speechRate = 1;
 let activeSpeechButton = null;
 let speechToken = 0;
+let speechTimer = null;
 
 function italianVoices() {
   return window.speechSynthesis
@@ -1086,11 +1089,54 @@ function resolveVoice() {
 
 function naturalSpeech(text) {
   return String(text)
+    .replace(/([a-z0-9._%+-]+)@([a-z0-9.-]+\.[a-z]{2,})/gi, (_, user, domain) => (
+      `${user} chiocciola ${domain.split(".").join(" punto ").replace(/-/g, " ")}`
+    ))
+    .replace(/\b((?:[a-z0-9-]+\.)+(?:it|com|info|app|net|edu))\b/gi, (domain) => (
+      domain.split(".").join(" punto ").replace(/-/g, " ")
+    ))
+    .replace(/\.(it|com|info|app|net|edu)\b/gi, (_, tld) => ` punto ${tld}`)
     .replace(/@/g, " chiocciola ")
+    .replace(/\//g, " barra ")
     .replace(/€/g, " euro")
     .replace(/·/g, ", ")
+    .replace(/\bSMS\b/g, "messaggio")
+    .replace(/\b3B\b/g, "terza B")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function splitSpeech(text) {
+  const blocks = String(text)
+    .split(/\n+/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  const chunks = [];
+
+  blocks.forEach((block) => {
+    if (block.length <= 240) {
+      chunks.push({ text: block, pause: 300 });
+      return;
+    }
+
+    const sentences = block
+      .split(/(?<=[.!?])\s+/)
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+
+    sentences.forEach((sentence, index) => {
+      const isLast = index === sentences.length - 1;
+      let pause = 120;
+
+      if (!isLast && /[!?]$/.test(sentence)) pause = 190;
+      if (isLast) pause = 300;
+
+      chunks.push({ text: sentence, pause });
+    });
+  });
+
+  return chunks;
 }
 
 function resetSpeechButtons() {
@@ -1105,6 +1151,12 @@ function resetSpeechButtons() {
 
 function stopSpeech() {
   speechToken += 1;
+
+  if (speechTimer) {
+    window.clearTimeout(speechTimer);
+    speechTimer = null;
+  }
+
   if (speechSupported) window.speechSynthesis.cancel();
   resetSpeechButtons();
 }
@@ -1124,19 +1176,8 @@ async function speak(text, button) {
   const voice = await resolveVoice();
   if (token !== speechToken) return;
 
-  const utterance = new SpeechSynthesisUtterance(naturalSpeech(text));
-  utterance.lang = "it-IT";
-  utterance.rate = 1;
-  utterance.pitch = 1;
-  utterance.volume = 1;
-  if (voice) utterance.voice = voice;
-
-  utterance.onend = () => {
-    if (token === speechToken) resetSpeechButtons();
-  };
-  utterance.onerror = () => {
-    if (token === speechToken) resetSpeechButtons();
-  };
+  const chunks = splitSpeech(text);
+  if (!chunks.length) return;
 
   activeSpeechButton = button;
   button.classList.add("is-speaking");
@@ -1145,68 +1186,160 @@ async function speak(text, button) {
   const label = button.querySelector(".speak-label");
   if (label) label.textContent = "Ferma";
 
-  window.speechSynthesis.speak(utterance);
+  let index = 0;
+
+  const playNext = () => {
+    if (token !== speechToken) return;
+
+    if (index >= chunks.length) {
+      speechTimer = null;
+      resetSpeechButtons();
+      return;
+    }
+
+    const chunk = chunks[index];
+    index += 1;
+
+    const utterance = new SpeechSynthesisUtterance(naturalSpeech(chunk.text));
+    utterance.lang = "it-IT";
+    utterance.rate = speechRate;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    if (voice) utterance.voice = voice;
+
+    utterance.onend = () => {
+      if (token !== speechToken) return;
+
+      if (index >= chunks.length) {
+        speechTimer = null;
+        resetSpeechButtons();
+        return;
+      }
+
+      speechTimer = window.setTimeout(playNext, chunk.pause);
+    };
+
+    utterance.onerror = () => {
+      if (token !== speechToken) return;
+      speechTimer = null;
+      resetSpeechButtons();
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  playNext();
 }
 
 function homeSpeech() {
   const lede = $("#screen-home .lede").textContent;
-  const steps = Array.from(document.querySelectorAll(".steps li"))
-    .map((item) => item.innerText.replace(/\s+/g, " ").trim())
-    .join(". ");
+  const steps = [
+    "Primo passo: Fermati. La fretta aiuta chi vuole ingannarti.",
+    "Secondo passo: Verifica. Controlla il mittente e l'indirizzo del link.",
+    "Terzo passo: Chiedi. Avvisa un adulto o segnala il messaggio."
+  ].join("\n");
 
-  return `Fermati. Guarda bene. Poi scegli. ${lede} In tre passi: ${steps}`;
+  return [
+    "Fermati. Guarda bene. Poi scegli.",
+    lede,
+    "In tre passi.",
+    steps
+  ].join("\n\n");
 }
 
 function messageSpeech(message) {
   if (message.kind === "email") {
-    return `Messaggio da ${message.from}. Oggetto: ${message.subject}. ${message.lines.join(" ")}`;
+    return [
+      `Messaggio da ${message.from}.`,
+      `Indirizzo: ${message.address}.`,
+      `Oggetto: ${message.subject}.`,
+      ...message.lines
+    ].join("\n\n");
   }
 
   if (message.kind === "post") {
-    return `Post di ${message.account}. ${message.caption} Immagine: ${message.imageLabel}. ${message.footer}`;
+    const parts = [
+      `Post di ${message.account}.`,
+      message.caption,
+      `Immagine: ${message.imageLabel}.`,
+      message.footer
+    ];
+    if (message.link) parts.push(`Link: ${message.link}.`);
+    return parts.join("\n\n");
   }
 
-  const parts = [`Messaggi: ${message.title}. ${message.subtitle}.`];
+  const parts = [
+    `Messaggi: ${message.title}.`,
+    `${message.subtitle}.`
+  ];
 
   if (message.code) {
     const codeValue = message.code.value.split("").join(" ");
-    parts.push(`Notifica di ${message.code.app}. ${message.code.label}: ${codeValue}. ${message.code.note}`);
+    parts.push(`Notifica di ${message.code.app}.\n\n${message.code.label}: ${codeValue}.\n\n${message.code.note}`);
   }
 
   message.bubbles.forEach((bubble) => {
-    const who = bubble.from ? `${bubble.from}: ` : "";
+    const who = bubble.from ? `${bubble.from} dice: ` : "";
     if (bubble.text) parts.push(`${who}${bubble.text}`);
     if (bubble.linkText) parts.push(`Link: ${bubble.linkText}.`);
-    if (bubble.photo) parts.push(`${who}foto: ${bubble.photoLabel}.`);
-    if (bubble.video) parts.push(`${who}video: ${bubble.video.label}.`);
-    if (bubble.voice) parts.push(`${who}messaggio vocale. Trascrizione: ${bubble.voice.transcript}`);
+    if (bubble.photo) {
+      const intro = bubble.from ? `${bubble.from} invia una foto: ` : "Foto: ";
+      parts.push(`${intro}${bubble.photoLabel}.`);
+    }
+    if (bubble.video) {
+      const intro = bubble.from ? `${bubble.from} invia un video: ` : "Video: ";
+      parts.push(`${intro}${bubble.video.label}.`);
+    }
+    if (bubble.voice) {
+      const intro = bubble.from ? `${bubble.from} invia un messaggio vocale.` : "Messaggio vocale.";
+      parts.push(`${intro}\n\nTrascrizione: ${bubble.voice.transcript}`);
+    }
     if (bubble.linkPreview) {
-      parts.push(`Link: ${bubble.linkPreview.domain}. ${bubble.linkPreview.title}. ${bubble.linkPreview.description}`);
+      parts.push(`Link: ${bubble.linkPreview.domain}.\n\n${bubble.linkPreview.title}.\n\n${bubble.linkPreview.description}`);
     }
   });
 
-  return parts.join(" ");
+  return parts.join("\n\n");
 }
 
 function scenarioSpeech(scenario) {
   const choices = scenario.choices
     .map((choice, index) => `Risposta ${index + 1}: ${choice.text}`)
-    .join(" ");
+    .join("\n\n");
 
-  return `${scenario.title}. ${scenario.intro} ${messageSpeech(scenario.message)} Cosa fai? ${choices}`;
+  return [
+    `${scenario.title}.`,
+    scenario.intro,
+    messageSpeech(scenario.message),
+    "Cosa fai?",
+    choices
+  ].join("\n\n");
 }
 
 function feedbackSpeech(choice) {
-  return `${choice.label}. ${choice.headline}. ${choice.consequence} Perché? ${choice.why}`;
+  return [
+    `${choice.label}.`,
+    choice.headline,
+    choice.consequence,
+    "Perché?",
+    choice.why
+  ].join("\n\n");
 }
 
 function summarySpeech() {
   const lede = $("#screen-summary .lede").textContent;
-  const rules = Array.from(document.querySelectorAll(".rule-card"))
-    .map((card) => card.innerText.replace(/\s+/g, " ").trim())
-    .join(". ");
+  const rules = [
+    "Fermati. Prima di cliccare, conta fino a tre. La fretta è l'aiuto migliore per chi vuole ingannarti.",
+    "Verifica. Guarda il mittente e l'indirizzo del link. Un logo uguale non significa che il sito sia vero.",
+    "Chiedi. Avvisa un docente o un adulto. Segnalare il messaggio protegge anche i compagni."
+  ].join("\n\n");
 
-  return `Riepilogo. ${$("#summary-title").textContent} ${lede} ${rules}`;
+  return [
+    "Riepilogo.",
+    $("#summary-title").textContent,
+    lede,
+    rules
+  ].join("\n\n");
 }
 
 /* ---------------------------------------------------------------
@@ -1272,6 +1405,11 @@ voiceSelect.addEventListener("change", () => {
     selectedVoice = voice;
     voiceChoiceIsManual = true;
   }
+  stopSpeech();
+});
+
+voiceRateSelect.addEventListener("change", () => {
+  speechRate = Number(voiceRateSelect.value) || 1;
   stopSpeech();
 });
 
