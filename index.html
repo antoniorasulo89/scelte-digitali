@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f3efe6">
+  <title>Scelte Digitali — Fermati, guarda, scegli</title>
+  <meta name="description" content="Percorso didattico in italiano per riconoscere i messaggi ingannevoli. Funziona offline, senza account e senza raccolta dati.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230c5c45'/%3E%3Crect%20x='23'%20y='18'%20width='6'%20height='28'%20rx='3'%20fill='%23f3efe6'/%3E%3Crect%20x='35'%20y='18'%20width='6'%20height='28'%20rx='3'%20fill='%23f3efe6'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <svg class="svg-sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-pause" viewBox="0 0 24 24">
+      <rect x="7" y="5" width="3.6" height="14" rx="1.6" fill="currentColor"/>
+      <rect x="13.4" y="5" width="3.6" height="14" rx="1.6" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-speaker" viewBox="0 0 24 24">
+      <path d="M4 9.5h3.2L12 5.6v12.8L7.2 14.5H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M15.4 9.2a4 4 0 0 1 0 5.6M17.9 6.8a7.4 7.4 0 0 1 0 10.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M20 6.5 9.4 17 4 11.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 7.5v5.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="12" cy="16.6" r="1.2" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24">
+      <path d="M4.8 10.2A7.8 7.8 0 1 1 6 16.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M4.5 5.5v4.9h4.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24">
+      <path d="M8 5.5 18.5 12 8 18.5z" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <a class="skip-link" href="#main">Salta al contenuto</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><use href="#i-pause"></use></svg>
+        </span>
+        <span class="brand-name">Scelte Digitali</span>
+      </div>
+      <div class="header-tools">
+        <details class="voice-settings" id="voiceSettings" hidden>
+          <summary>Voce</summary>
+          <div class="voice-panel">
+            <label for="voiceSelect">Voce del dispositivo</label>
+            <select id="voiceSelect"></select>
+            <button class="voice-test" id="voiceTest" type="button" aria-pressed="false" data-label="Prova">
+              <svg class="icon" aria-hidden="true"><use href="#i-speaker"></use></svg>
+              <span class="speak-label">Prova</span>
+            </button>
+            <p class="voice-note" id="voiceNote">La qualità dipende dalle voci installate nel sistema. Puoi aggiungerne altre dalle impostazioni del dispositivo.</p>
+          </div>
+        </details>
+        <p class="header-note"><span class="status-dot" aria-hidden="true"></span> Progetto didattico</p>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- 1 · HOME -->
+    <section class="screen" id="screen-home" aria-labelledby="home-title">
+      <div class="home">
+        <div class="home-copy">
+          <p class="eyebrow">Educazione civica digitale</p>
+          <h1 id="home-title" tabindex="-1">Fermati. Guarda bene. Poi scegli.</h1>
+          <p class="lede">Una situazione alla volta. Leggi il messaggio, scegli cosa faresti e scopri cosa succede davvero. Non ci sono voti: puoi riprovare quante volte vuoi.</p>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="startBtn" type="button">
+              <span>Inizia il percorso</span>
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg>
+            </button>
+            <button class="btn btn-quiet js-speak" type="button" data-read="home" aria-pressed="false">
+              <svg class="icon" aria-hidden="true"><use href="#i-speaker"></use></svg>
+              <span class="speak-label">Ascolta</span>
+            </button>
+          </div>
+
+          <p class="meta"><span id="homeMeta">10 scenari</span> · circa 15 minuti · nessun dato salvato</p>
+
+          <noscript>
+            <p class="noscript">Per usare il percorso serve JavaScript. Attivalo nel browser e ricarica la pagina.</p>
+          </noscript>
+
+          <ol class="steps">
+            <li>
+              <span class="step-num" aria-hidden="true">1</span>
+              <div>
+                <h2>Fermati</h2>
+                <p>La fretta aiuta chi vuole ingannarti.</p>
+              </div>
+            </li>
+            <li>
+              <span class="step-num" aria-hidden="true">2</span>
+              <div>
+                <h2>Verifica</h2>
+                <p>Controlla il mittente e l'indirizzo del link.</p>
+              </div>
+            </li>
+            <li>
+              <span class="step-num" aria-hidden="true">3</span>
+              <div>
+                <h2>Chiedi</h2>
+                <p>Avvisa un adulto o segnala il messaggio.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <aside class="home-visual" aria-label="Anteprima del primo scenario">
+          <div class="preview-wrap">
+            <div class="preview" aria-hidden="true">
+              <div class="preview-top">
+                <span class="preview-tag">Scenario 1</span>
+                <span class="mail-time">oggi, 08:14</span>
+              </div>
+              <div class="sender">
+                <span class="avatar">SD</span>
+                <div class="sender-text">
+                  <p class="mail-name">Segreteria Digitale</p>
+                  <p class="mail-address">segreteria@istituto-sicurezza.info</p>
+                </div>
+              </div>
+              <p class="mail-subject">Conferma la tua password entro 24 ore</p>
+              <p class="mail-line">Il tuo account sarà bloccato. Conferma ora le tue credenziali.</p>
+              <div class="mail-cta">Conferma ora</div>
+              <p class="mail-note">Esempio: il link non si apre.</p>
+            </div>
+          </div>
+          <p class="preview-title">L'email della password</p>
+          <p class="preview-sub">Cosa faresti se ti chiedessero la password?</p>
+        </aside>
+      </div>
+
+      <section class="path" aria-labelledby="path-title">
+        <div class="path-head">
+          <div>
+            <p class="eyebrow">Il percorso</p>
+            <h2 id="path-title">Scegli uno scenario.</h2>
+          </div>
+          <p class="map-progress" id="mapProgress">0 di 10 completati</p>
+        </div>
+        <p class="path-lede">Puoi seguirli in ordine o iniziare da quello che ti interessa. Ogni scenario si può riprovare.</p>
+        <div class="scenario-map" id="scenarioMap"></div>
+      </section>
+    </section>
+
+    <!-- 2 · SCENARIO -->
+    <section class="screen" id="screen-scenario" aria-labelledby="scenario-title" hidden>
+      <div class="narrow">
+        <div class="scenario-top">
+          <button class="link-back" id="backHomeBtn" type="button">← Torna alla mappa</button>
+          <div class="progress">
+            <span class="progress-label" id="progressLabel">Scenario 1 di 10</span>
+            <span class="progress-track" aria-hidden="true"><span class="progress-fill" id="progressFill"></span></span>
+          </div>
+        </div>
+
+        <h1 class="scenario-title" id="scenario-title" tabindex="-1">L'email della password</h1>
+        <p class="lede" id="scenarioIntro">Leggi il messaggio. Poi scegli cosa fai.</p>
+
+        <div class="read-row">
+          <button class="btn btn-quiet js-speak" type="button" data-read="scenario" aria-pressed="false">
+            <svg class="icon" aria-hidden="true"><use href="#i-speaker"></use></svg>
+            <span class="speak-label">Ascolta</span>
+          </button>
+          <span class="read-hint">Ascolta il messaggio e le tre risposte.</span>
+        </div>
+
+        <p class="sim-note">Messaggi simulati: link, video e messaggi vocali non si aprono.</p>
+
+        <div id="messageMount"></div>
+
+        <h2 class="choices-title" id="choicesTitle">Cosa fai?</h2>
+        <div class="choices" id="choices" role="group" aria-labelledby="choicesTitle"></div>
+        <p class="reassure">Nessuna scelta è definitiva: puoi riprovare.</p>
+      </div>
+    </section>
+
+    <!-- 3 · FEEDBACK -->
+    <section class="screen" id="screen-feedback" aria-labelledby="feedback-title" hidden>
+      <div class="narrow">
+        <button class="link-back feedback-back" id="feedbackMapBtn" type="button">← Torna alla mappa</button>
+
+        <div class="verdict" id="verdictPill">
+          <svg id="verdictIcon" aria-hidden="true"><use href="#i-check"></use></svg>
+          <span id="verdictLabel">Scelta migliore</span>
+        </div>
+
+        <h1 id="feedback-title" tabindex="-1">Cosa succede</h1>
+        <p class="consequence" id="feedbackConsequence"></p>
+
+        <div class="read-row">
+          <button class="btn btn-quiet js-speak" type="button" data-read="feedback" aria-pressed="false">
+            <svg class="icon" aria-hidden="true"><use href="#i-speaker"></use></svg>
+            <span class="speak-label">Ascolta</span>
+          </button>
+        </div>
+
+        <div class="why">
+          <h2>Perché?</h2>
+          <p id="feedbackWhy"></p>
+        </div>
+
+        <div class="rule-chip" id="ruleChip"></div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="retryBtn" type="button">Riprova lo scenario</button>
+          <button class="btn btn-primary" id="continueBtn" type="button" hidden>Continua</button>
+          <button class="btn btn-quiet" id="reviewBtn" type="button">Rivedi il messaggio</button>
+        </div>
+        <p class="reassure" id="feedbackFoot"></p>
+      </div>
+    </section>
+
+    <!-- 4 · RIEPILOGO -->
+    <section class="screen" id="screen-summary" aria-labelledby="summary-title" hidden>
+      <div class="narrow">
+        <div class="done-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><use href="#i-check"></use></svg>
+        </div>
+        <p class="eyebrow" id="summaryEyebrow">Riepilogo del percorso</p>
+        <h1 id="summary-title" tabindex="-1">Hai imparato a fermarti.</h1>
+        <p class="lede" id="summaryLede">Hai concluso questo scenario. Ricordati di questi tre passi, in ogni situazione.</p>
+
+        <div class="rules">
+          <div class="rule-card">
+            <span class="rule-num" aria-hidden="true">1</span>
+            <h2>Fermati</h2>
+            <p>Prima di cliccare, conta fino a tre. La fretta è l'aiuto migliore per chi vuole ingannarti.</p>
+          </div>
+          <div class="rule-card">
+            <span class="rule-num" aria-hidden="true">2</span>
+            <h2>Verifica</h2>
+            <p>Guarda il mittente e l'indirizzo del link. Un logo uguale non significa che il sito sia vero.</p>
+          </div>
+          <div class="rule-card">
+            <span class="rule-num" aria-hidden="true">3</span>
+            <h2>Chiedi</h2>
+            <p>Avvisa un docente o un adulto. Segnalare il messaggio protegge anche i compagni.</p>
+          </div>
+        </div>
+
+        <div class="summary-status">
+          <div>
+            <strong id="summaryProgress">0 di 10 scenari completati</strong>
+            <p class="summary-note" id="summaryNote"></p>
+          </div>
+          <span class="data-note">Nessun dato salvato</span>
+        </div>
+
+        <p class="next-note">Puoi tornare alla mappa per rivedere uno scenario o provarne un altro. I progressi restano finché non ricominci.</p>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="mapBtn" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg>
+            <span>Torna alla mappa</span>
+          </button>
+          <button class="btn btn-quiet" id="restartBtn" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-restart"></use></svg>
+            <span>Ricomincia da zero</span>
+          </button>
+          <button class="btn btn-quiet js-speak" type="button" data-read="summary" aria-pressed="false">
+            <svg class="icon" aria-hidden="true"><use href="#i-speaker"></use></svg>
+            <span class="speak-label">Ascolta</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Scelte Digitali · Progetto didattico</span>
+      <span>Nessun dato raccolto · Funziona senza connessione</span>
+    </div>
+  </footer>
+
+  <p class="sr-only" role="status" aria-live="polite" id="live"></p>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
